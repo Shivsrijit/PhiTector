@@ -154,4 +154,24 @@ def check_anchor_tags(url: str) -> int:
                 return 1
         return 0
     except Exception:
-        return -1
+        return 0
+
+
+def check_metadata_tags(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, "html.parser")
+
+        meta_tags = soup.find_all("meta")
+        for tag in meta_tags:
+            if "name" in tag.attrs and tag.attrs["name"].lower() in [
+                "description",
+                "keywords",
+            ]:
+                return 1
+
+        return 0
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return 0

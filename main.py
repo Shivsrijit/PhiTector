@@ -36,6 +36,7 @@ def index(url: Optional[str] = None) -> dict:
     https_token = check_https_token(url)
     external_objects = check_external_objects(url)
     check_tags = check_anchor_tags(url)
+    metadata = check_metadata_tags(url)
 
     return {
         "usingIP": using_ip,
@@ -52,6 +53,7 @@ def index(url: Optional[str] = None) -> dict:
         "httpsToken": https_token,
         "externalObjects": external_objects,
         "anchorTags": check_tags,
+        "metadata": metadata,
     }
 
 
