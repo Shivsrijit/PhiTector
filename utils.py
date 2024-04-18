@@ -65,21 +65,21 @@ def having_ssl_cert(url: str) -> int:
 def get_domain_reg_len(url: str) -> int:
     try:
         domain = whois.whois(url)
+
+        if type(domain.expiration_date) == list:
+            expiration_date = domain.expiration_date[0]
+        else:
+            expiration_date = domain.expiration_date
+
+        if (expiration_date is None) or (type(expiration_date) == str):
+            return 1
+
+        registration_length = abs((expiration_date - domain.creation_date).days)
+        if registration_length / 365 <= 1:
+            return 1
+        return 0
     except Exception:
         return 1
-
-    if type(domain.expiration_date) == list:
-        expiration_date = domain.expiration_date[0]
-    else:
-        expiration_date = domain.expiration_date
-
-    if (expiration_date is None) or (type(expiration_date) == str):
-        return 1
-
-    registration_length = abs((expiration_date - domain.creation_date).days)
-    if registration_length / 365 <= 1:
-        return 1
-    return 0
 
 
 def check_favicon(url: str) -> int:
@@ -109,11 +109,11 @@ def check_all_ports_open(url: str) -> int:
     return 1
 
 
-def check_https_token(host):
+def check_https_token(url: str) -> int:
     try:
         context = ssl.create_default_context()
-        with socket.create_connection((host, 443)) as sock:
-            with context.wrap_socket(sock, server_hostname=host):
+        with socket.create_connection((url, 443)) as sock:
+            with context.wrap_socket(sock, server_hostname=url):
                 return 1
     except Exception:
         return 0
@@ -157,7 +157,7 @@ def check_anchor_tags(url: str) -> int:
         return 0
 
 
-def check_metadata_tags(url):
+def check_metadata_tags(url: str) -> int:
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -172,6 +172,42 @@ def check_metadata_tags(url):
                 return 1
 
         return 0
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    except Exception:
+        return 0
+
+
+def check_suspicious_sfh(url: str) -> int:
+    if url == "" or url.lower() == "about:blank":
+        return 1
+
+    sfh_domain = urlparse(url).netloc
+
+    if sfh_domain != url:
+        return 1
+
+    return 0
+
+
+def submit_to_email(url: str) -> int:
+    return url.lower().endswith(".php") or url.lower().startswith("mailto:")
+
+
+def check_legitimate_website(url: str) -> int:
+    parsed_url = urlparse(url)
+    domain = parsed_url.netloc
+
+    try:
+        whois.whois(domain)
+        return 1
+    except Exception:
+        return 0
+
+
+def check_redirects_legitimacy(url: str) -> int:
+    try:
+        response = requests.get(url, allow_redirects=True)
+        redirects_count = len(response.history)
+
+        return 1 if redirects_count <= 4 else 0
+    except Exception:
         return 0

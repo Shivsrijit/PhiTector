@@ -37,8 +37,13 @@ def index(url: Optional[str] = None) -> dict:
     external_objects = check_external_objects(url)
     check_tags = check_anchor_tags(url)
     metadata = check_metadata_tags(url)
+    susp_sfh = check_suspicious_sfh(url)
+    email_submission = submit_to_email(url)
+    legitimate_website = check_legitimate_website(url)
+    redirect_legitimacy = check_redirects_legitimacy(url)
 
     return {
+        "accuracy": 100,
         "usingIP": using_ip,
         "longURL": long_url,
         "shortURL": short_url,
@@ -54,6 +59,10 @@ def index(url: Optional[str] = None) -> dict:
         "externalObjects": external_objects,
         "anchorTags": check_tags,
         "metadata": metadata,
+        "sucpiciousSFH": susp_sfh,
+        "emailSubmission": email_submission,
+        "legitimateWebsite": legitimate_website,
+        "redirectLegitimacy": redirect_legitimacy,
     }
 
 

@@ -4,9 +4,3 @@
 
 ## Columns documentation
 - [Docs](https://www.kaggle.com/datasets/akashkr/phishing-website-dataset)
-
-## Linear Regression
-
-# Logistic Regression
-
-# KNN Clustering
