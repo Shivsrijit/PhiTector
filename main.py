@@ -13,6 +13,7 @@ cursor = conn.cursor()
 cursor.execute(
     """CREATE TABLE IF NOT EXISTS cache
                   (url TEXT PRIMARY KEY, 
+                   accuracy INTEGER,
                    lin_pred INTEGER, 
                    log_pred INTEGER, 
                    knn_pred INTEGER,
@@ -138,13 +139,20 @@ def index(url: Optional[str] = None) -> dict:
     log_pred = int(log_pic.predict(x_val)[0])
     knn_pred = int(knn_pic.predict(x_val)[0])
 
+    accuracy = (
+        0.927003573251659 * lin_pred
+        + 0.9285349668198061 * log_pred
+        + 0.9683511995916284 * knn_pred
+    ) / 3
+
     print(lin_pred)
     print(log_pred)
     print(knn_pred)
 
     cursor.execute(
-        "INSERT OR REPLACE INTO cache VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT OR REPLACE INTO cache VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
+            accuracy,
             url,
             lin_pred,
             log_pred,
@@ -183,6 +191,7 @@ def index(url: Optional[str] = None) -> dict:
     conn.commit()
 
     return {
+        "accuracy": accuracy,
         "lin_pred": lin_pred,
         "log_pred": log_pred,
         "knn_pred": knn_pred,
