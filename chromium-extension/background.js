@@ -14,8 +14,11 @@ function getData(url) {
 		console.warn('Error: ', error);
 	});
 }
-chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-    console.log(tabs[0].url);
-});
+
 
 getData(myurl);
+
+chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
+    let url = tabs[0].url;
+    console.log(url);
+});
