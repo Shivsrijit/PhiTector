@@ -134,9 +134,9 @@ def index(url: Optional[str] = None) -> dict:
 
     x_val = np.array(arr).reshape(1, -1)
 
-    lin_pred = lin_pic.predict(x_val)[0]
-    log_pred = log_pic.predict(x_val)[0]
-    knn_pred = knn_pic.predict(x_val)[0]
+    lin_pred = int(lin_pic.predict(x_val)[0])
+    log_pred = int(log_pic.predict(x_val)[0])
+    knn_pred = int(knn_pic.predict(x_val)[0])
 
     print(lin_pred)
     print(log_pred)

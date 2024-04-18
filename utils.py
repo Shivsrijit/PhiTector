@@ -14,9 +14,9 @@ def is_using_ip(url: str) -> int:
     parsed_url = urlparse(url)
     hostname = parsed_url.hostname
     if hostname and any(char.isdigit() for char in hostname):
-        return 0
-    else:
         return 1
+    else:
+        return 0
 
 
 def is_long_url(url: str) -> int:
@@ -83,7 +83,7 @@ def get_domain_reg_len(url: str) -> int:
             return 1
         return 0
     except:
-        return 1
+        return 0
 
 
 def check_favicon(url: str) -> int:
@@ -98,7 +98,7 @@ def check_favicon(url: str) -> int:
         else:
             return 0
     except:
-        return 0
+        return 1
 
 
 def check_all_ports_open(url: str) -> int:
@@ -118,9 +118,9 @@ def check_https_token(url: str) -> int:
         context = ssl.create_default_context()
         with socket.create_connection((url, 443)) as sock:
             with context.wrap_socket(sock, server_hostname=url):
-                return 1
+                return 0
     except:
-        return 0
+        return 1
 
 
 def check_external_objects(url: str) -> int:
@@ -266,11 +266,10 @@ def popup_window(url: str) -> int:
                 if field.get("name") == "name" or field.get("name") == "email":
                     return 0
 
-        return 1
-
-    except Exception as e:
-        print("Error occurred while fetching webpage source code:", e)
         return 0
+
+    except:
+        return 1
 
 
 def check_invisible_iframes(url: str) -> int:
