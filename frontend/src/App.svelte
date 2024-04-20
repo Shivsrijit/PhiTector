@@ -18,13 +18,18 @@
 
 <input bind:value={url} />
 
-<table>
-  <thead></thead>
-  <tbody></tbody>
-</table>
+
 
 <button on:click={handleClick}>Submit</button>
 
 {#if clicked}
+  <p>Accuracy: {resp.accuracy}</p>
   <p>{JSON.stringify(resp)}</p>
+  <table>
+    <thead>
+      <tr></tr>
+      <td></td>
+    </thead>
+    <tbody></tbody>
+  </table>
 {/if}
