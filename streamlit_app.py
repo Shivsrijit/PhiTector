@@ -53,6 +53,7 @@ with open("log.pkl", "rb") as f:
 with open("knn.pkl", "rb") as f:
     knn_pic = pickle.load(f)
 
+
 def get_results(url: str, lin_pic, log_pic, knn_pic) -> dict:
     cursor.execute("SELECT * FROM cache WHERE url=?", (url,))
     cached_result = cursor.fetchone()
@@ -177,6 +178,7 @@ def get_results(url: str, lin_pic, log_pic, knn_pic) -> dict:
 
     return {
         "accuracy": accuracy,
+        "url": url,
         "lin_pred": lin_pred,
         "log_pred": log_pred,
         "knn_pred": knn_pred,
@@ -214,7 +216,7 @@ def get_results(url: str, lin_pic, log_pic, knn_pic) -> dict:
 st.title("PhiTector - Detect Phishing Links")
 st.subheader("Enter a URL below and check the possibility of it being a phishing link")
 
-url = st.text_input(label='URL')
+url = st.text_input(label="URL")
 
 if st.button("Check"):
     if not url:
