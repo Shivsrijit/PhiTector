@@ -2,15 +2,6 @@ import streamlit as st
 import numpy as np
 import pickle
 import sqlite3
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urlparse
-import ssl
-import re
-from datetime import datetime
-import alexapy
-from googlesearch import search
-
 from utils import *
 
 conn = sqlite3.connect("cache.db", check_same_thread=False)
@@ -53,13 +44,13 @@ cursor.execute(
 )
 conn.commit()
 
-with open("../lin.pkl", "rb") as f:
+with open("lin.pkl", "rb") as f:
     lin_pic = pickle.load(f)
 
-with open("../log.pkl", "rb") as f:
+with open("log.pkl", "rb") as f:
     log_pic = pickle.load(f)
 
-with open("../knn.pkl", "rb") as f:
+with open("knn.pkl", "rb") as f:
     knn_pic = pickle.load(f)
 
 def get_results(url: str, lin_pic, log_pic, knn_pic) -> dict:

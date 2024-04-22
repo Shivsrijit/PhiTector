@@ -27,7 +27,7 @@ def is_long_url(url: str) -> int:
 
 
 def is_shortened_url(url: str) -> int:
-    with open("../short_urls") as f:
+    with open("short_urls") as f:
         shortening_services = f.read().splitlines()
 
     for service in shortening_services:
