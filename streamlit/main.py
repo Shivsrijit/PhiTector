@@ -1,19 +1,24 @@
-from fastapi import FastAPI
-from typing import Optional
-
+import streamlit as st
 import numpy as np
 import pickle
 import sqlite3
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse
+import ssl
+import re
+from datetime import datetime
+import alexapy
+from googlesearch import search
 
 from utils import *
 
 conn = sqlite3.connect("cache.db", check_same_thread=False)
 cursor = conn.cursor()
-
 cursor.execute(
     """CREATE TABLE IF NOT EXISTS cache
-                  (url TEXT PRIMARY KEY, 
-                   accuracy INTEGER,
+                  (accuracy INTEGER,
+                   url TEXT PRIMARY KEY, 
                    lin_pred INTEGER, 
                    log_pred INTEGER, 
                    knn_pred INTEGER,
@@ -48,23 +53,16 @@ cursor.execute(
 )
 conn.commit()
 
-app = FastAPI()
-
-with open("lin.pkl", "rb") as f:
+with open("../lin.pkl", "rb") as f:
     lin_pic = pickle.load(f)
 
-with open("log.pkl", "rb") as f:
+with open("../log.pkl", "rb") as f:
     log_pic = pickle.load(f)
 
-with open("knn.pkl", "rb") as f:
+with open("../knn.pkl", "rb") as f:
     knn_pic = pickle.load(f)
 
-
-@app.get("/")
-def index(url: Optional[str] = None) -> dict:
-    if not url:
-        return {"error": "Please provide a url"}
-
+def get_results(url: str, lin_pic, log_pic, knn_pic) -> dict:
     cursor.execute("SELECT * FROM cache WHERE url=?", (url,))
     cached_result = cursor.fetchone()
 
@@ -145,12 +143,8 @@ def index(url: Optional[str] = None) -> dict:
         + 0.9683511995916284 * knn_pred
     ) / 3
 
-    print(lin_pred)
-    print(log_pred)
-    print(knn_pred)
-
     cursor.execute(
-        "INSERT OR REPLACE INTO cache VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT OR REPLACE INTO cache VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
             accuracy,
             url,
@@ -210,7 +204,7 @@ def index(url: Optional[str] = None) -> dict:
         "externalObjects": external_objects,
         "anchorTags": check_tags,
         "metadata": metadata,
-        "sucpiciousSFH": susp_sfh,
+        "suspiciousSFH": susp_sfh,
         "emailSubmission": email_submission,
         "legitimateWebsite": legitimate_website,
         "redirectLegitimacy": redirect_legitimacy,
@@ -226,7 +220,22 @@ def index(url: Optional[str] = None) -> dict:
     }
 
 
-if __name__ == "__main__":
-    import uvicorn
+st.title("PhiTector - Detect Phishing Links")
+st.subheader("Enter a URL below and check the possibility of it being a phishing link")
 
-    uvicorn.run("main:app", host="0.0.0.0", port=8000)
+url = st.text_input(label='URL')
+
+if st.button("Check"):
+    if not url:
+        st.error("Please provide a URL")
+    else:
+        cursor.execute("SELECT * FROM cache WHERE url=?", (url,))
+        cached_result = cursor.fetchone()
+
+        if cached_result:
+            column_names = [description[0] for description in cursor.description]
+            cached_data = dict(zip(column_names, cached_result))
+            st.write(cached_data)
+        else:
+            results = get_results(url, lin_pic, log_pic, knn_pic)
+            st.write(results)
