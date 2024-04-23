@@ -24,13 +24,17 @@ This project aims to detect phishing websites using machine learning techniques.
 
 ### Requirements
 Install the required modules by running the following command after cd'ing to the working folder.
+
 ```pip install -r requirements.txt```
 
 ### Running the program
 #### Streamlit:
 Run the Streamlit file by using either of these commands:
+
 ```python -m streamlit run streamlit_app.py```
+
 or
+
 ```streamlit run streamlit_app.py```
 
 #### Chromium Extension:
