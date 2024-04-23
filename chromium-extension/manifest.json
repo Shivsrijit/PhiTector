@@ -1,15 +1,15 @@
 {
   "manifest_version": 2,
-  "name": "Sidebar Data",
-  "version": "1.0",
-  "description": "Displays data from the current page in the sidebar popup.",
+  "name": "PhiTector",
+  "version": "1.1",
+  "description": "Detects potential phishing links",
   "permissions": [
     "activeTab",
     "http://localhost:8000/*"
   ],
   "browser_action": {
     "default_popup": "popup.html",
-    "default_icon": {}
+    "default_icon": "images/logo.png"
   },
   "icons": {}
 }
