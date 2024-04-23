@@ -117,7 +117,7 @@ def check_external_objects(url: str) -> int:
                 return 1
         return -1
     except:
-        return 1
+        return 0
 
 
 def check_anchor_tags(url: str) -> int:
@@ -191,7 +191,7 @@ def popup_window(url: str) -> int:
         return -1
 
     except:
-        return 1
+        return 0
 
 
 def check_invisible_iframes(url: str) -> int:
