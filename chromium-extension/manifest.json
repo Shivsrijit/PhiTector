@@ -1,13 +1,20 @@
 {
-    "manifest_version": 3,
-    "name": "PhiTector",
-    "description": "Detects Phishing links and flags them",
-    "version": "1.0",
-    "action": {
-      "default_popup": "popup.html",
-      "default_icon": "images/logo.png",
-      "permissions": [
-        "tabs"
-      ] 
+  "manifest_version": 3,
+  "name": "PhiTector",
+  "description": "Detects Phishing links and flags them",
+  "version": "1.0",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"]
     }
-  }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "images/logo.png"
+  },
+  "permissions": ["storage", "tabs"]
+}
