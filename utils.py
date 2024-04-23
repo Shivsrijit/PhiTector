@@ -13,14 +13,14 @@ def is_using_ip(url: str) -> int:
     if hostname and any(char.isdigit() for char in hostname):
         return 1
     else:
-        return 0
+        return -1
 
 
 def is_long_url(url: str) -> int:
     if len(url) > 54:
         return 1
     else:
-        return 0
+        return -1
 
 
 def is_shortened_url(url: str) -> int:
@@ -30,37 +30,37 @@ def is_shortened_url(url: str) -> int:
     for service in shortening_services:
         if service in url:
             return 1
-    return 0
+    return -1
 
 
 def having_at_symbol(url: str) -> int:
     if "@" in url:
         return 1
-    return 0
+    return -1
 
 
 def double_slash_redirect(url: str) -> int:
     if "//" in url:
         return 1
-    return 0
+    return -1
 
 
 def having_dash_symbol(url: str) -> int:
     if "-" in urlparse(url).path:
         return 1
-    return 0
+    return -1
 
 
 def having_sub_domain(url: str) -> int:
     if urlparse(url).netloc.count(".") > 2:
         return 1
-    return 0
+    return -1
 
 
 def having_ssl_cert(url: str) -> int:
     if "https" in urlparse(url).scheme:
         return 1
-    return 0
+    return -1
 
 
 def get_domain_reg_len(url: str) -> int:
@@ -75,7 +75,7 @@ def get_domain_reg_len(url: str) -> int:
         return 1
 
     except socket.error:
-        return 0
+        return -1
 
 
 def check_favicon(url: str) -> int:
@@ -88,19 +88,19 @@ def check_favicon(url: str) -> int:
         if favicon_link:
             return 1
         else:
-            return 0
+            return -1
     except:
         return 1
 
 
 def check_https_token(url: str) -> int:
     try:
-        pattern = r"https\W{0,1}(?=.*?\.)"
+        pattern = r"https\W{-1,1}(?=.*?\.)"
         if re.search(pattern, url):
             return 1
-        return 0
+        return -1
     except:
-        return 0
+        return -1
 
 
 def check_external_objects(url: str) -> int:
@@ -115,7 +115,7 @@ def check_external_objects(url: str) -> int:
             object_domain = urlparse(object_url).netloc
             if object_domain != main_domain:
                 return 1
-        return 0
+        return -1
     except:
         return 1
 
@@ -136,9 +136,9 @@ def check_anchor_tags(url: str) -> int:
             href_domain = urlparse(href).netloc
             if href_domain and href_domain != main_domain:
                 return 1
-        return 0
+        return -1
     except:
-        return 0
+        return -1
 
 
 def check_fake_url_status_bar(url):
@@ -154,9 +154,9 @@ def check_fake_url_status_bar(url):
             if "window.status" in event:
                 return 1
 
-        return 0
+        return -1
     except:
-        return 0
+        return -1
 
 
 def check_disable_right_click(url):
@@ -169,10 +169,10 @@ def check_disable_right_click(url):
         if right_click_events:
             return 1
         else:
-            return 0
+            return -1
 
     except:
-        return 0
+        return -1
 
 
 def popup_window(url: str) -> int:
@@ -186,9 +186,9 @@ def popup_window(url: str) -> int:
             input_fields = pop_up.find_all("input")
             for field in input_fields:
                 if field.get("name") == "name" or field.get("name") == "email":
-                    return 0
+                    return -1
 
-        return 0
+        return -1
 
     except:
         return 1
@@ -203,13 +203,13 @@ def check_invisible_iframes(url: str) -> int:
 
         for iframe in iframes:
             frame_border = iframe.get("frameborder")
-            if frame_border is not None and frame_border == "0":
+            if frame_border is not None and frame_border == "-1":
                 return 1
 
-        return 0
+        return -1
 
     except:
-        return 0
+        return -1
 
 
 def check_domain_legitimacy(url: str) -> int:
@@ -219,22 +219,22 @@ def check_domain_legitimacy(url: str) -> int:
         creation_date = domain_info.creation_date
 
         if isinstance(creation_date, list):
-            creation_date = creation_date[0]
+            creation_date = creation_date[-1]
 
         today = datetime.now()
         age = today - creation_date
 
-        age_months = age.days / 30
+        age_months = age.days / 3 - 1
 
         min_age_legitimate = 6
 
         if age_months >= min_age_legitimate:
             return 1
         else:
-            return 0
+            return -1
 
     except:
-        return 0
+        return -1
 
 
 def check_dns_and_whois(domain: str) -> int:
@@ -242,12 +242,12 @@ def check_dns_and_whois(domain: str) -> int:
         domain_info = whois.whois(domain)
 
         if not domain_info:
-            return 0
+            return -1
 
         if not domain_info.name_servers:
-            return 0
+            return -1
 
         return 1
 
     except:
-        return 0
+        return -1
