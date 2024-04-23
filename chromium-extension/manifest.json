@@ -1,20 +1,15 @@
 {
-  "manifest_version": 3,
-  "name": "PhiTector",
-  "description": "Detects Phishing links and flags them",
+  "manifest_version": 2,
+  "name": "Sidebar Data",
   "version": "1.0",
-  "background": {
-    "service_worker": "background.js"
-  },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["contentScript.js"]
-    }
+  "description": "Displays data from the current page in the sidebar popup.",
+  "permissions": [
+    "activeTab",
+    "http://localhost:8000/*"
   ],
-  "action": {
+  "browser_action": {
     "default_popup": "popup.html",
-    "default_icon": "images/logo.png"
+    "default_icon": {}
   },
-  "permissions": ["storage", "tabs"]
+  "icons": {}
 }
