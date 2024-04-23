@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
-  var dataPlaceholder = document.getElementById("data-placeholder");
+  const dataPlaceholder = document.getElementById("data-placeholder");
   const urlPlacholder = document.getElementById("url-placeholder");
 
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    var activeTab = tabs[0];
+    const activeTab = tabs[0];
 
     urlPlacholder.textContent = activeTab.url;
 
@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.json())
       .then((data) => {
         console.log("data: ", data);
-        dataPlaceholder.textContent = data.accuracy;
+        dataPlaceholder.textContent = Math.round(data.accuracy*100) + '%';
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
