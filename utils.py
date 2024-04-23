@@ -3,11 +3,8 @@ import whois
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
-import ssl
 import re
 from datetime import datetime
-import alexapy
-from googlesearch import search
 
 
 def is_using_ip(url: str) -> int:
@@ -43,7 +40,7 @@ def having_at_symbol(url: str) -> int:
 
 
 def double_slash_redirect(url: str) -> int:
-    if "//" in urlparse(url).path:
+    if "//" in url:
         return 1
     return 0
 
@@ -68,21 +65,16 @@ def having_ssl_cert(url: str) -> int:
 
 def get_domain_reg_len(url: str) -> int:
     try:
-        domain = whois.whois(url)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        if type(domain.expiration_date) == list:
-            expiration_date = domain.expiration_date[0]
-        else:
-            expiration_date = domain.expiration_date
+        sock.settimeout(3)
 
-        if (expiration_date is None) or (type(expiration_date) == str):
-            return 1
+        sock.connect((url, 443))
 
-        registration_length = abs((expiration_date - domain.creation_date).days)
-        if registration_length / 365 <= 1:
-            return 1
-        return 0
-    except:
+        sock.close()
+        return 1
+
+    except socket.error:
         return 0
 
 
@@ -101,26 +93,14 @@ def check_favicon(url: str) -> int:
         return 1
 
 
-def check_all_ports_open(url: str) -> int:
-    for port in range(1, 65536):
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(1)
-            s.connect((url, port))
-            s.close()
-        except:
-            return 0
-    return 1
-
-
 def check_https_token(url: str) -> int:
     try:
-        context = ssl.create_default_context()
-        with socket.create_connection((url, 443)) as sock:
-            with context.wrap_socket(sock, server_hostname=url):
-                return 0
+        pattern = r"https\W{0,1}(?=.*?\.)"
+        if re.search(pattern, url):
+            return 1
+        return 0
     except:
-        return 1
+        return 0
 
 
 def check_external_objects(url: str) -> int:
@@ -157,64 +137,6 @@ def check_anchor_tags(url: str) -> int:
             if href_domain and href_domain != main_domain:
                 return 1
         return 0
-    except:
-        return 0
-
-
-def check_metadata_tags(url: str) -> int:
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, "html.parser")
-
-        meta_tags = soup.find_all("meta")
-        for tag in meta_tags:
-            if "name" in tag.attrs and tag.attrs["name"].lower() in [
-                "description",
-                "keywords",
-            ]:
-                return 1
-
-        return 0
-    except:
-        return 0
-
-
-def check_suspicious_sfh(url: str) -> int:
-    if url == "" or url.lower() == "about:blank":
-        return 1
-
-    sfh_domain = urlparse(url).netloc
-
-    if sfh_domain != url:
-        return 1
-
-    return 0
-
-
-def submit_to_email(url: str) -> int:
-    if url.lower().endswith(".php") or url.lower().startswith("mailto:"):
-        return 0
-    return 1
-
-
-def check_legitimate_website(url: str) -> int:
-    parsed_url = urlparse(url)
-    domain = parsed_url.netloc
-
-    try:
-        whois.whois(domain)
-        return 1
-    except:
-        return 0
-
-
-def check_redirects_legitimacy(url: str) -> int:
-    try:
-        response = requests.get(url, allow_redirects=True)
-        redirects_count = len(response.history)
-
-        return 1 if redirects_count <= 4 else 0
     except:
         return 0
 
@@ -327,47 +249,5 @@ def check_dns_and_whois(domain: str) -> int:
 
         return 1
 
-    except:
-        return 0
-
-
-def check_alexa_rank(domain):
-    try:
-        api = alexapy.API()
-
-        rank_info = api.rank(domain)
-
-        if not rank_info:
-            return 0
-
-        if rank_info["rank"] is None or rank_info["rank"] > 100000:
-            return 0
-
-        return 1
-
-    except:
-        return 0
-
-
-def get_page_rank(url):
-    try:
-        search_results = search("info:" + url, num=1, stop=1, pause=2)
-
-        for result in search_results:
-            if result.startswith("http"):
-                return 1
-        return 0
-    except:
-        return 0
-
-
-def check_google_index(url):
-    try:
-        search_results = search("info:" + url, num=1, stop=1, pause=2)
-
-        for result in search_results:
-            if result.startswith("http"):
-                return 1
-        return 0
     except:
         return 0

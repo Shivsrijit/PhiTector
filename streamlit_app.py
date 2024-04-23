@@ -1,8 +1,8 @@
 import streamlit as st
-import numpy as np
 import pickle
 import sqlite3
 from utils import *
+import pandas as pd
 
 conn = sqlite3.connect("cache.db", check_same_thread=False)
 cursor = conn.cursor()
@@ -23,24 +23,15 @@ cursor.execute(
                    havingSSLCert INTEGER,
                    domainRegLen INTEGER,
                    havingFavicon INTEGER,
-                   port INTEGER,
                    httpsToken INTEGER,
                    externalObjects INTEGER,
                    anchorTags INTEGER,
-                   metadata INTEGER,
-                   suspiciousSFH INTEGER,
-                   emailSubmission INTEGER,
-                   legitimateWebsite INTEGER,
-                   redirectLegitimacy INTEGER,
                    mouseOver INTEGER,
                    rightClick INTEGER,
                    popupWindow INTEGER,
                    iframe INTEGER,
                    domainLegitimacy INTEGER,
-                   dnsRecord INTEGER,
-                   ranking INTEGER,
-                   pageRank INTEGER,
-                   googleIndex INTEGER)"""
+                   dnsRecord INTEGER)"""
 )
 conn.commit()
 
@@ -73,70 +64,55 @@ def get_results(url: str, lin_pic, log_pic, knn_pic) -> dict:
     ssl_cert = having_ssl_cert(url)
     reg_len = get_domain_reg_len(url)
     favicon = check_favicon(url)
-    sockets = check_all_ports_open(url)
     https_token = check_https_token(url)
     external_objects = check_external_objects(url)
     check_tags = check_anchor_tags(url)
-    metadata = check_metadata_tags(url)
-    susp_sfh = check_suspicious_sfh(url)
-    email_submission = submit_to_email(url)
-    legitimate_website = check_legitimate_website(url)
-    redirect_legitimacy = check_redirects_legitimacy(url)
     mouse_over = check_fake_url_status_bar(url)
     check_right_click = check_disable_right_click(url)
     check_popup_window = popup_window(url)
     check_iframes = check_invisible_iframes(url)
     domain_legitimacy = check_domain_legitimacy(url)
     dns_record = check_dns_and_whois(url)
-    check_ranking = check_alexa_rank(url)
-    page_ranking = get_page_rank(url)
-    google_index = check_google_index(url)
 
-    arr = [
-        using_ip,
-        long_url,
-        short_url,
-        at_symbol,
-        slash_redirect,
-        dash_symbol,
-        sub_domain,
-        ssl_cert,
-        reg_len,
-        favicon,
-        sockets,
-        https_token,
-        external_objects,
-        check_tags,
-        metadata,
-        susp_sfh,
-        email_submission,
-        legitimate_website,
-        redirect_legitimacy,
-        mouse_over,
-        check_right_click,
-        check_popup_window,
-        check_iframes,
-        domain_legitimacy,
-        dns_record,
-        check_ranking,
-        page_ranking,
-        google_index,
-    ]
+    data = pd.DataFrame(
+        {
+            "UsingIP": [using_ip],
+            "LongURL": [long_url],
+            "ShortURL": [short_url],
+            "Symbol@": [at_symbol],
+            "Redirecting//": [slash_redirect],
+            "PrefixSuffix-": [dash_symbol],
+            "SubDomains": [sub_domain],
+            "HTTPS": [ssl_cert],
+            "DomainRegLen": [reg_len],
+            "Favicon": [favicon],
+            "HTTPSDomainURL": [https_token],
+            "RequestURL": [external_objects],
+            "AnchorURL": [check_tags],
+            "StatusBarCust": [mouse_over],
+            "DisableRightClick": [check_right_click],
+            "UsingPopupWindow": [check_popup_window],
+            "IframeRedirection": [check_iframes],
+            "AgeofDomain": [domain_legitimacy],
+            "DNSRecording": [dns_record],
+        }
+    )
 
-    x_val = np.array(arr).reshape(1, -1)
+    lin_pred = lin_pic.predict(data)[0]
+    log_pred = int(log_pic.predict(data)[0])
+    knn_pred = int(knn_pic.predict(data)[0])
 
-    lin_pred = int(lin_pic.predict(x_val)[0])
-    log_pred = int(log_pic.predict(x_val)[0])
-    knn_pred = int(knn_pic.predict(x_val)[0])
+    lin_pred = (lin_pred + 1) / 2
 
-    accuracy = (
-        0.927003573251659 * lin_pred
-        + 0.9285349668198061 * log_pred
-        + 0.9683511995916284 * knn_pred
-    ) / 3
+    accuracy = (lin_pred + log_pred + knn_pred) / 3
+
+    if accuracy > 1:
+        accuracy = 1
+    elif accuracy < 0:
+        accuracy = 0
 
     cursor.execute(
-        "INSERT OR REPLACE INTO cache VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT OR REPLACE INTO cache VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
             accuracy,
             url,
@@ -153,24 +129,15 @@ def get_results(url: str, lin_pic, log_pic, knn_pic) -> dict:
             ssl_cert,
             reg_len,
             favicon,
-            sockets,
             https_token,
             external_objects,
             check_tags,
-            metadata,
-            susp_sfh,
-            email_submission,
-            legitimate_website,
-            redirect_legitimacy,
             mouse_over,
             check_right_click,
             check_popup_window,
             check_iframes,
             domain_legitimacy,
             dns_record,
-            check_ranking,
-            page_ranking,
-            google_index,
         ),
     )
 
@@ -192,24 +159,15 @@ def get_results(url: str, lin_pic, log_pic, knn_pic) -> dict:
         "havingSSLCert": ssl_cert,
         "domainRegLen": reg_len,
         "havingFavicon": favicon,
-        "port": sockets,
         "httpsToken": https_token,
         "externalObjects": external_objects,
         "anchorTags": check_tags,
-        "metadata": metadata,
-        "suspiciousSFH": susp_sfh,
-        "emailSubmission": email_submission,
-        "legitimateWebsite": legitimate_website,
-        "redirectLegitimacy": redirect_legitimacy,
         "mouseOver": mouse_over,
         "rightClick": check_right_click,
         "popupWindow": check_popup_window,
         "iframe": check_iframes,
         "domainLegitimacy": domain_legitimacy,
         "dnsRecord": dns_record,
-        "ranking": check_ranking,
-        "pageRank": page_ranking,
-        "googleIndex": google_index,
     }
 
 
