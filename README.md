@@ -17,6 +17,7 @@ Submission for CIA-2 for Foundations of Data Science, Semester 2, 2023-27 batch.
 - Numpy
 - Matplotlib
 - Scikit-Learn
+- SQLite
 - Streamlit
 - Manifest v2 (Chromium extension)
 - FastAPI
