@@ -1,11 +1,13 @@
-## Phishing Detector
+# ![PhiTector](https://raw.githubusercontent.com/Shivsrijit/PhiTector/main/chromium-extension/images/logo_w.png)
+
+## PhiTector - Phishing Detector
 
 ### Project Description
 This project aims to detect phishing websites using machine learning techniques. We trained our model on a synthetic Kaggle dataset and deployed it on both a Streamlit web page and a Chromium extension, which makes it compatible with major browsers like Chrome, Edge, Opera, Brave etc. and would help the average consumer in identifying potential phishing websites.
 
 Submission for CIA-2 for Foundations of Data Science, Semester 2, 2023-27 batch.
 
-### Team Phishermen
+### Team Phishermen 🐟🎣
 - [Shivsrijit](https://github.com/shivsrijit/)
 - [Raghav Sridharan](https://github.com/raghavsridharan)
 - [Saran Shankar](https://github.com/try3d/)
