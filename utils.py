@@ -75,7 +75,7 @@ def get_domain_reg_len(url: str) -> int:
         return 1
 
     except socket.error:
-        return -1
+        return 0
 
 
 def check_favicon(url: str) -> int:
@@ -100,7 +100,7 @@ def check_https_token(url: str) -> int:
             return 1
         return -1
     except:
-        return -1
+        return 0
 
 
 def check_external_objects(url: str) -> int:
@@ -138,7 +138,7 @@ def check_anchor_tags(url: str) -> int:
                 return 1
         return -1
     except:
-        return -1
+        return 0
 
 
 def check_fake_url_status_bar(url):
@@ -156,7 +156,7 @@ def check_fake_url_status_bar(url):
 
         return -1
     except:
-        return -1
+        return 0
 
 
 def check_disable_right_click(url):
@@ -172,7 +172,7 @@ def check_disable_right_click(url):
             return -1
 
     except:
-        return -1
+        return 0
 
 
 def popup_window(url: str) -> int:
@@ -209,7 +209,7 @@ def check_invisible_iframes(url: str) -> int:
         return -1
 
     except:
-        return -1
+        return 0
 
 
 def check_domain_legitimacy(url: str) -> int:
@@ -234,7 +234,7 @@ def check_domain_legitimacy(url: str) -> int:
             return -1
 
     except:
-        return -1
+        return 0
 
 
 def check_dns_and_whois(domain: str) -> int:
@@ -250,4 +250,4 @@ def check_dns_and_whois(domain: str) -> int:
         return 1
 
     except:
-        return -1
+        return 0
