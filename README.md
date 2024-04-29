@@ -24,6 +24,8 @@ Submission for CIA-2 for Foundations of Data Science, Semester 2, 2023-27 batch.
 - Manifest v2 (Chromium extension)
 - FastAPI
 
+### [Kaggle Dataset](https://www.kaggle.com/datasets/akashkr/phishing-website-dataset)
+
 ### Requirements
 Install the required modules by running the following command after cd'ing to the working folder.
 
