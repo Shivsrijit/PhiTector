@@ -1,9 +1,9 @@
+import re
 import socket
 import whois
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
-import re
 from datetime import datetime
 
 
